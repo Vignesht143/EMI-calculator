@@ -1,5 +1,5 @@
 import "./App.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState,useCallback } from "react";
 import { tenureDate } from "./utils/constants";
 import { numberWithCommas} from "./utils/config";
 import TextInput from "./components/text-input";
@@ -13,18 +13,33 @@ function App() {
   const [tenure,setTenure]=useState(12);
   const [emi,setEmi]=useState(0);
 
-  const calculateEMI=(downPayment)=>{
-    if(!cost) return;
+  // const calculateEMI=(downPayment)=>{
+  //   if(!cost) return;
 
-    const loanAmt = cost-downPayment;
+  //   const loanAmt = cost-downPayment;
+  //   const rateOfInterest = interest / 100;
+  //   const numOfYears = tenure / 12;
+
+  //   const EMI = (loanAmt*rateOfInterest*(1+rateOfInterest)**numOfYears)/
+  //               ((1+rateOfInterest)** numOfYears-1);
+
+  //               return Number(EMI / 12).toFixed(0);
+  // };
+
+  const calculateEMI = useCallback((downPayment) => {
+    if (!cost) return;
+
+    const loanAmt = cost - downPayment;
     const rateOfInterest = interest / 100;
     const numOfYears = tenure / 12;
 
-    const EMI = (loanAmt*rateOfInterest*(1+rateOfInterest)**numOfYears)/
-                ((1+rateOfInterest)** numOfYears-1);
+    const EMI =
+      (loanAmt * rateOfInterest * (1 + rateOfInterest) ** numOfYears) /
+      ((1 + rateOfInterest) ** numOfYears - 1);
 
-                return Number(EMI / 12).toFixed(0);
-  };
+    return Number(EMI / 12).toFixed(0);
+  }, [cost, interest, tenure]);
+  
 
   const calculateDP =(emi)=>{
     if(!cost) return;
@@ -40,7 +55,7 @@ function App() {
     }
     const emi = calculateEMI(downPayment);
     setEmi(emi);
-  },[tenure,cost]);
+  },[tenure,cost,calculateEMI, downPayment]);
 
    const updateEMI=(e)=>{
     if(!cost) return;
